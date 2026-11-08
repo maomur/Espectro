@@ -101,6 +101,16 @@ describe('puntuación', () => {
       expect(Math.abs(pos - t.pos)).toBeLessThanOrEqual(1.6)
     }
   })
+  it('decir que no a todo, o que sí a todo, deja cerca del centro', () => {
+    const w = defaultWeights()
+    for (let seed = 0; seed < 30; seed++) {
+      const r = buildRounds(w, seed)
+      for (const v of [0, 1]) {
+        const pos = computePosition(r, r.map((x) => ({ roundId: x.id, scores: Object.fromEntries(x.items.map((id) => [id, v])) })), w)!
+        expect(pos).toBeGreaterThanOrEqual(3.5); expect(pos).toBeLessThanOrEqual(6.5)
+      }
+    }
+  })
   it('quien apoya por igual todo queda cerca del centro, y "me da igual" no cuenta', () => {
     const w = defaultWeights()
     const r = buildRounds(w, 5)

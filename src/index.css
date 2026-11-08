@@ -179,6 +179,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .medal.empty { color: #ffffff66; font-size: 1.3rem; border: 2px dashed #ffffff40; background: transparent; }
 .medal.pop { animation: wobble .45s; }
 
+/* Medalla para redes */
+.share-modal { background: rgba(8,5,24,.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); animation: fadeIn .3s both; }
+.share-preview { animation: mechIn .7s cubic-bezier(.2,.9,.3,1.25) both; filter: drop-shadow(0 20px 40px #000c); }
+.medal-cta { animation: float 4s ease-in-out infinite; }
+
 /* Espectro */
 .intro-spectrum { position: relative; width: min(300px, 80vw); height: 10px; border-radius: 999px; background: linear-gradient(90deg, #dc2626, #f472b6 32%, #a78bfa 50%, #38bdf8 68%, #16a34a); }
 .intro-spectrum span { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px #1a103d, 0 0 18px #fff; translate: -50% -50%; animation: sweep 3.2s ease-in-out infinite; }

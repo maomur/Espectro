@@ -5,6 +5,7 @@ import { useGame } from '../store'
 import { sfx, haptic } from '../audio/sfx'
 import { confetti, burst } from './fx'
 import { World } from './World'
+import { ShareModal } from './ShareCard'
 
 const FLIP_GAP = 260
 
@@ -28,6 +29,7 @@ export function Reveal() {
   const [flipped, setFlipped] = useState(0)
   const [stage, setStage] = useState<'curtain' | 'flip' | 'bars' | 'done'>('curtain')
   const [grow, setGrow] = useState(false)
+  const [card, setCard] = useState(false)
   const barsRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -106,6 +108,7 @@ export function Reveal() {
             <p className="mt-1 text-[1.05rem] font-bold text-violet-100/85"><b className="text-[1.3rem] tabular-nums">{fmt(pos)}</b> sobre 10 · 0 es la izquierda y 10 la derecha</p>
             <Spectrum value={grow ? pos : 5} big />
             <p className="mt-3 text-[1.05rem] leading-snug font-semibold text-violet-100/85">{me.about}</p>
+            {stage === 'done' && <button className="btn-main medal-cta mt-4 w-full" onClick={() => { sfx.whoosh(); setCard(true) }}>🏅 Ver mi medalla para redes</button>}
             <div className="mt-4 grid gap-3">
               {posEco !== null && <div><p className="text-[15px] font-extrabold">💶 En economía: <span style={{ color: partyById(tendencyOf(posEco)).color }}>{partyById(tendencyOf(posEco)).name.toLowerCase()}</span> ({fmt(posEco)})</p><Spectrum value={grow ? posEco : 5} /></div>}
               {posCul !== null && <div><p className="text-[15px] font-extrabold">🧭 En valores y sociedad: <span style={{ color: partyById(tendencyOf(posCul)).color }}>{partyById(tendencyOf(posCul)).name.toLowerCase()}</span> ({fmt(posCul)})</p><Spectrum value={grow ? posCul : 5} /></div>}
@@ -167,11 +170,13 @@ export function Reveal() {
           </details>
 
           <div className="screen-in mt-4 flex flex-col gap-2.5">
-            <button className="btn-main" onClick={share}>Retar a un amigo 📲</button>
+            {pos !== null && <button className="btn-main" onClick={() => { sfx.whoosh(); setCard(true) }}>🏅 Compartir mi medalla</button>}
+            <button className="btn-ghost py-3" onClick={share}>Retar a un amigo 📲</button>
             <button className="btn-ghost py-3" onClick={() => { sfx.whoosh(); restart() }}>Jugar otra vez</button>
           </div>
         </>}
       </div>
+      {card && pos !== null && <ShareModal data={{ pos, eco: posEco, cul: posCul }} onClose={() => setCard(false)} />}
     </div>
   )
 }

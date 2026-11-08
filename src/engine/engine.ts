@@ -108,21 +108,25 @@ function answered(rounds: Round[], answers: Answer[], weights: Weights) {
 }
 
 /**
- * Tu posición en la escala 0–10: el punto donde tus respuestas encajan mejor con lo que
- * apoyaría alguien situado ahí (mínimos cuadrados sobre una rejilla de 0,05).
+ * Tu posición en la escala 0–10.
+ * Lo que apoyas te acerca a su posición. Lo que rechazas te aleja de ella (cuenta como su
+ * opuesto, 10 − posición), con más fuerza cuanto más extrema es la idea: rechazar una idea
+ * de centro no dice hacia qué lado estás. Así, decir que sí a todo o que no a todo deja
+ * en el centro, y nadie acaba en un extremo solo por contestar "no" muchas veces.
  * Se puede calcular solo con un eje (económico o social). Devuelve null si no hay respuestas.
  */
 export function computePosition(rounds: Round[], answers: Answer[], weights: Weights, dim?: 'eco' | 'cul'): number | null {
   const xs = answered(rounds, answers, weights).filter((x) => !dim || x.dim === dim)
   if (!xs.length) return null
-  let best = 5, bestErr = Infinity
-  for (let k = 0; k <= 200; k++) {
-    const p = k / 20
-    let err = 0
-    for (const x of xs) err += x.w * (x.a - expected(x.pos, p)) ** 2
-    if (err < bestErr - 1e-9) { bestErr = err; best = p }
+  let num = 0, den = 0
+  for (const x of xs) {
+    const pull = x.w * x.a
+    const push = x.w * (1 - x.a) * 0.5 * (Math.abs(x.pos - 5) / 5)
+    num += pull * x.pos + push * (10 - x.pos)
+    den += pull + push
   }
-  return Math.round(best * 10) / 10
+  if (den < 1e-9) return 5
+  return Math.round((num / den) * 10) / 10
 }
 
 /** Etiqueta de una posición, con los mismos cortes que las ideas */
