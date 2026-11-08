@@ -149,11 +149,11 @@ export function Reveal() {
             </div>
 
             <p className="screen-in rounded-2xl border border-white/10 bg-white/5 p-4 text-[1.02rem] leading-snug font-semibold text-violet-100/80">
-              Resultado <b>orientativo</b>. Usa la escala izquierda–derecha del CIS. «Extrema» solo significa lo más lejos del centro, no es un juicio.
+              Resultado <b>orientativo</b>. Usa la escala izquierda–derecha del CIS y preguntas de encuestas internacionales (ESS, WVS, ISSP). «Extrema» solo significa lo más lejos del centro, no es un juicio.
             </p>
 
             <details className="screen-in glass rounded-2xl p-4">
-              <summary className="cursor-pointer text-[1.1rem] font-extrabold">📚 Ver todas las ideas ({seen.length})</summary>
+              <summary className="cursor-pointer text-[1.1rem] font-extrabold">📚 Ver todas las ideas ({seen.length}) y sus fuentes</summary>
               <ul className="mt-3 flex flex-col gap-4">
                 {seen.map(({ p, v }) => {
                   const t = partyById(p.partyId)
@@ -162,6 +162,7 @@ export function Reveal() {
                       <div className="flex items-center justify-between gap-2 text-[15px] font-black"><span style={{ color: t.color }}>{t.name} · {fmt(p.pos)}</span><span>{verdict(v)}</span></div>
                       <p className="mt-1 text-[1.1rem] leading-snug font-extrabold">{p.title}</p>
                       <p className="text-[1rem] leading-snug font-semibold text-violet-100/75">{p.detail}</p>
+                      <p className="mt-1 text-[.95rem] font-semibold text-violet-200/70">Basada en: <a className="underline" href={p.url} target="_blank" rel="noreferrer">{p.src} ↗</a></p>
                     </li>
                   )
                 })}

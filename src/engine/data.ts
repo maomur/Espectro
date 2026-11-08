@@ -145,14 +145,99 @@ const RAW: Record<TopicId, Row[]> = {
   ],
 }
 
+/** Encuestas y estudios de los que salen las preguntas */
+export const SOURCES = {
+  ches: { name: 'Dimensiones económica y social del Chapel Hill Expert Survey', url: 'https://garymarks.web.unc.edu/wp-content/uploads/sites/13018/2016/09/CHES_trends_party-politics.pdf' },
+  issp: { name: 'ISSP 2016 · Papel del Gobierno (encuesta internacional)', url: 'https://swb.skku.edu/_res/kgss/etc/ISSP2016.pdf' },
+  ess: { name: 'Encuesta Social Europea (ESS), ronda 9', url: 'https://catalog.ihsn.org/catalog/8936/data-dictionary/F1' },
+  essIncome: { name: 'Encuesta Social Europea (ESS) · diferencias de ingresos', url: 'https://www.ark.ac.uk/sol/surveys/gen_social_att/ESS/2002/website/Politics/GINCDIF.html' },
+  essGay: { name: 'Encuesta Social Europea (ESS), ronda 8', url: 'https://www.europeansocialsurvey.org/sites/default/files/2023-06/ESS8_attitudes_homosexuality_final.pdf' },
+  wvsEq: { name: 'Encuesta Mundial de Valores (WVS), ola 7 · igualdad o incentivos', url: 'https://catalog.ihsn.org/catalog/11550/variable/F1/V141?name=Q106' },
+  wvsOwn: { name: 'Encuesta Mundial de Valores (WVS), ola 7 · empresa privada o pública', url: 'https://catalog.ihsn.org/catalog/12312/variable/F1/V142?name=Q107' },
+  wvs: { name: 'Encuesta Mundial de Valores (WVS), ola 7', url: 'https://www.worldvaluessurvey.org/WVSDocumentationWV7.jsp' },
+  cis: { name: 'CIS · pregunta sobre la organización territorial del Estado', url: 'https://upo.es/investiga/simetrica/wp-content/uploads/2018/02/DT-2018-001.pdf' },
+} as const
+type SrcKey = keyof typeof SOURCES
+
+/**
+ * Preguntas adaptadas de encuestas internacionales y del CIS (lenguaje sencillo).
+ * Cada pregunta original se ha convertido en una afirmación, a veces en sus dos sentidos.
+ */
+const EXTRA: [TopicId, number, 'eco' | 'cul', string, string, WorldItem, SrcKey][] = [
+  // ISSP · ¿debería ser responsabilidad del Gobierno…?
+  ['trabajo', 1.6, 'eco', 'Que el Estado garantice un trabajo a todo el que quiera trabajar', 'Si no lo encuentra, el Estado se lo da.', 'fabrica', 'issp'],
+  ['economia', 3.0, 'eco', 'Que el Gobierno controle los precios', 'Que no suban sin límite los productos básicos.', 'moneda', 'issp'],
+  ['economia', 5.0, 'eco', 'Que el Estado ayude a la industria a crecer', 'Con dinero y apoyo a las empresas que crean empleo.', 'fabrica', 'issp'],
+  ['trabajo', 3.2, 'eco', 'Que el Estado asegure una vida digna a quien está en paro', 'Con ayudas suficientes mientras busca trabajo.', 'moneda', 'issp'],
+  ['servicios', 3.8, 'eco', 'Becas para universitarios de familias con pocos ingresos', 'Que nadie deje de estudiar por dinero.', 'escuela', 'issp'],
+  ['servicios', 2.8, 'eco', 'Que el Estado dé una casa digna a quien no puede pagarla', 'Vivienda pública para quien lo necesita.', 'casa', 'issp'],
+  ['economia', 3.4, 'cul', 'Leyes estrictas para que la industria contamine menos', 'Aunque a las empresas les cueste más producir.', 'arbol', 'issp'],
+  ['valores', 3.6, 'cul', 'Que el Estado impulse la igualdad entre hombres y mujeres', 'Con leyes y ayudas para conseguirla.', 'torre', 'issp'],
+  // ISSP · gasto público
+  ['seguridad', 6.6, 'cul', 'Gastar más dinero en policía', 'Más agentes y más medios.', 'torre', 'issp'],
+  ['pais', 7.4, 'cul', 'Gastar más dinero en el ejército y la defensa', 'Para estar mejor preparados.', 'torre', 'issp'],
+  ['trabajo', 7.6, 'eco', 'Gastar menos dinero en ayudas por desempleo', 'Para animar a la gente a buscar trabajo.', 'moneda', 'issp'],
+  ['servicios', 3.4, 'eco', 'Más dinero público para la cultura y las artes', 'Teatro, cine, música y bibliotecas.', 'escuela', 'issp'],
+  // ISSP · medidas económicas
+  ['impuestos', 7.2, 'eco', 'Recortar el gasto del Gobierno', 'Gastar menos dinero público en general.', 'moneda', 'issp'],
+  ['trabajo', 3.6, 'eco', 'Que el Estado pague obras para crear empleo', 'Carreteras, edificios y proyectos que den trabajo.', 'grua', 'issp'],
+  ['economia', 7.2, 'eco', 'Menos normas del Gobierno para las empresas', 'Que las empresas tengan más libertad.', 'fabrica', 'issp'],
+  ['economia', 3.4, 'eco', 'Ayudar con dinero público a las industrias en crisis', 'Para salvar sus puestos de trabajo.', 'fabrica', 'issp'],
+  ['trabajo', 2.0, 'eco', 'Trabajar menos horas para repartir el trabajo', 'Que haya empleo para más gente.', 'fabrica', 'issp'],
+  // ISSP · impuestos
+  ['impuestos', 2.6, 'eco', 'Los que más ganan pagan muy pocos impuestos', 'Deberían pagar bastante más.', 'moneda', 'issp'],
+  ['impuestos', 6.4, 'eco', 'La clase media paga demasiados impuestos', 'Habría que bajárselos.', 'moneda', 'issp'],
+  // ISSP · libertades y vigilancia
+  ['seguridad', 7.6, 'cul', 'Cámaras de vigilancia en todos los lugares públicos', 'Calles, plazas y transporte vigilados.', 'farola', 'issp'],
+  ['seguridad', 8.4, 'cul', 'Que el Gobierno pueda leer mensajes para prevenir delitos', 'Aunque se pierda privacidad.', 'torre', 'issp'],
+  ['seguridad', 8.6, 'cul', 'Que la policía pueda parar y registrar a cualquiera en la calle', 'Sin necesidad de un motivo concreto.', 'torre', 'issp'],
+  ['seguridad', 3.4, 'cul', 'Poder manifestarse contra el Gobierno siempre que se quiera', 'Sin pedir permiso ni arriesgarse a multas.', 'farola', 'issp'],
+  // WVS · valores económicos
+  ['impuestos', 1.8, 'eco', 'Que los sueldos sean más parecidos entre todos', 'Menos diferencia entre lo que gana cada uno.', 'moneda', 'wvsEq'],
+  ['trabajo', 7.0, 'eco', 'Premiar más el esfuerzo de cada uno', 'Aunque haya más diferencia de sueldos.', 'moneda', 'wvsEq'],
+  ['economia', 7.4, 'eco', 'Que haya más empresas privadas y menos del Estado', 'Más negocio privado en la economía.', 'fabrica', 'wvsOwn'],
+  ['economia', 1.6, 'eco', 'Que el Estado sea dueño de más empresas', 'Más empresas públicas en la economía.', 'torre', 'wvsOwn'],
+  ['servicios', 2.2, 'eco', 'Que el Estado se encargue de que a nadie le falte de nada', 'El Gobierno debe cuidar de todos.', 'casa', 'wvs'],
+  ['trabajo', 7.8, 'eco', 'Que cada uno se responsabilice de salir adelante por sí mismo', 'Sin esperar que el Estado se lo resuelva.', 'casa', 'wvs'],
+  ['economia', 6.8, 'eco', 'La competencia es buena: hace que la gente se esfuerce', 'Y que salgan nuevas ideas.', 'grua', 'wvs'],
+  // WVS · ¿se puede justificar…?
+  ['valores', 3.0, 'cul', 'La eutanasia es aceptable', 'Poder pedir una muerte digna con una enfermedad incurable.', 'hospital', 'wvs'],
+  ['valores', 2.8, 'cul', 'El aborto es aceptable', 'Que una mujer pueda decidir interrumpir su embarazo.', 'hospital', 'wvs'],
+  ['valores', 4.4, 'cul', 'El divorcio es aceptable', 'Que una pareja pueda separarse cuando quiera.', 'casa', 'wvs'],
+  ['seguridad', 9.4, 'cul', 'Que haya pena de muerte para los crímenes más graves', 'Como terrorismo o asesinatos múltiples.', 'torre', 'wvs'],
+  // ESS · ingresos e inmigración
+  ['impuestos', 2.8, 'eco', 'El Gobierno debe reducir las diferencias de ingresos', 'Entre los que más y los que menos tienen.', 'moneda', 'essIncome'],
+  ['inmigracion', 2.4, 'cul', 'Dejar venir a mucha gente de países pobres de fuera de Europa', 'Para vivir y trabajar aquí.', 'tren', 'ess'],
+  ['inmigracion', 8.4, 'cul', 'Dejar entrar a muy pocos inmigrantes de culturas distintas', 'Solo a unos pocos.', 'torre', 'ess'],
+  ['inmigracion', 3.4, 'cul', 'La inmigración es buena para la economía', 'Trae trabajadores y riqueza.', 'fabrica', 'ess'],
+  ['inmigracion', 2.8, 'cul', 'Los inmigrantes enriquecen nuestra cultura', 'Aportan comida, música y costumbres nuevas.', 'escuela', 'ess'],
+  ['inmigracion', 9.0, 'cul', 'Los inmigrantes hacen que el país sea peor para vivir', 'Habría que frenar su llegada.', 'torre', 'ess'],
+  ['inmigracion', 6.4, 'cul', 'La inmigración pone en riesgo nuestras costumbres', 'Hay que proteger la forma de vida de aquí.', 'casa', 'ess'],
+  // ESS · Europa y diversidad
+  ['pais', 3.6, 'cul', 'La Unión Europea debería unirse todavía más', 'Más decisiones juntas entre los países.', 'torre', 'ess'],
+  ['pais', 8.0, 'cul', 'La Unión Europea ha ido demasiado lejos', 'Decide demasiadas cosas por nosotros.', 'torre', 'ess'],
+  ['valores', 4.0, 'cul', 'Que gais y lesbianas vivan su vida como quieran', 'Con total libertad.', 'casa', 'essGay'],
+  ['valores', 2.8, 'cul', 'Que las parejas gais puedan adoptar igual que las demás', 'Con los mismos derechos para tener hijos.', 'casa', 'essGay'],
+  // CIS · organización territorial
+  ['pais', 1.2, 'cul', 'Que las comunidades puedan llegar a ser estados independientes', 'Si sus ciudadanos lo deciden.', 'torre', 'cis'],
+  ['pais', 7.4, 'cul', 'Que las comunidades autónomas tengan menos poder que ahora', 'Que el Gobierno central decida más cosas.', 'torre', 'cis'],
+]
+
 /** La tendencia a la que pertenece una posición de la escala */
 export const tendencyOf = (pos: number) =>
   pos < 2.2 ? 'ei' : pos < 4.15 ? 'ci' : pos < 5.9 ? 'c' : pos < 7.9 ? 'cd' : 'ed'
 
-export const PROPOSALS: Proposal[] = (Object.keys(RAW) as TopicId[]).flatMap((topic) =>
-  RAW[topic].map(([pos, dim, title, detail, world], k) => ({
-    id: `${topic}-${k + 1}`, partyId: tendencyOf(pos), topic, title, detail, world, pos, dim,
-  })))
+export const PROPOSALS: Proposal[] = [
+  ...(Object.keys(RAW) as TopicId[]).flatMap((topic) =>
+    RAW[topic].map(([pos, dim, title, detail, world], k): Proposal => ({
+      id: `${topic}-${k + 1}`, partyId: tendencyOf(pos), topic, title, detail, world, pos, dim,
+      src: SOURCES.ches.name, url: SOURCES.ches.url,
+    }))),
+  ...EXTRA.map(([topic, pos, dim, title, detail, world, key], k): Proposal => ({
+    id: `x-${topic}-${k + 1}`, partyId: tendencyOf(pos), topic, title, detail, world, pos, dim,
+    src: SOURCES[key].name, url: SOURCES[key].url,
+  })),
+]
 
 export const DATA_DATE = '8 de noviembre de 2026'
 

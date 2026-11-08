@@ -53,7 +53,12 @@ export const useGame = create<S>((set, get) => ({
 
   start: () => {
     const seed = Math.floor(Math.random() * 1e9)
-    set({ seed, rounds: buildRounds(get().weights, seed), answers: [], index: 0, world: [], streak: 0, phase: 'play' })
+    // recordar en este dispositivo qué ideas salieron, para que el próximo test traiga otras
+    let avoid = new Set<string>()
+    try { avoid = new Set(JSON.parse(localStorage.getItem('espectro.seen') ?? '[]')) } catch { /* sin memoria */ }
+    const rounds = buildRounds(get().weights, seed, undefined, avoid)
+    try { localStorage.setItem('espectro.seen', JSON.stringify(rounds.flatMap((r) => r.items))) } catch { /* */ }
+    set({ seed, rounds, answers: [], index: 0, world: [], streak: 0, phase: 'play' })
   },
 
   answer: (scores, opts = {}) => {

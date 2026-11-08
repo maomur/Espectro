@@ -10,8 +10,12 @@ const randomWeights = (seed: number): Weights => {
 }
 
 describe('datos', () => {
-  it('cada tendencia tiene 2 o 3 ideas en cada tema', () => {
-    for (const t of TOPICS) for (const p of PARTIES) { const n = PROPOSALS.filter((x) => x.topic === t.id && x.partyId === p.id).length; expect(n).toBeGreaterThanOrEqual(2); expect(n).toBeLessThanOrEqual(3) }
+  it('cada tendencia tiene al menos 2 ideas en cada tema y el banco es amplio', () => {
+    for (const t of TOPICS) for (const p of PARTIES) { const n = PROPOSALS.filter((x) => x.topic === t.id && x.partyId === p.id).length; expect(n).toBeGreaterThanOrEqual(2) }
+  })
+  it('banco de más de 120 ideas, todas con fuente', () => {
+    expect(PROPOSALS.length).toBeGreaterThan(120)
+    for (const p of PROPOSALS) { expect(p.src.length).toBeGreaterThan(5); expect(p.url).toMatch(/^https:\/\//) }
   })
   it('ids únicos', () => expect(new Set(PROPOSALS.map((p) => p.id)).size).toBe(PROPOSALS.length))
   it('cada idea tiene posición 0-10 y eje, y su tendencia coincide con la posición', () => {
@@ -79,6 +83,16 @@ describe('rondas', () => {
     }
   })
 
+  it('el siguiente test evita las ideas del anterior', () => {
+    const w = defaultWeights()
+    for (let seed = 0; seed < 50; seed++) {
+      const first = buildRounds(w, seed)
+      const seen = new Set(first.flatMap((r) => r.items))
+      const second = buildRounds(w, seed + 1000, undefined, seen)
+      const ids = second.flatMap((r) => r.items)
+      expect(ids.filter((id) => seen.has(id)).length / ids.length).toBeLessThan(0.25)
+    }
+  })
   it('determinista con la misma semilla', () => expect(buildRounds(defaultWeights(), 42)).toEqual(buildRounds(defaultWeights(), 42)))
 })
 

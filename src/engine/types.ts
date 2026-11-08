@@ -36,6 +36,10 @@ export interface Proposal {
   pos: number
   /** eje: económico (Estado y mercado) o social y cultural (valores, identidad, orden) */
   dim: 'eco' | 'cul'
+  /** encuesta o estudio en el que se basa la pregunta */
+  src: string
+  /** enlace para comprobarlo */
+  url: string
 }
 
 export type Weight = 1 | 2 | 3

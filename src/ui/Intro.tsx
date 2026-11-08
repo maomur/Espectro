@@ -68,7 +68,7 @@ export function Intro() {
       </div>
 
       <p className="screen-in mt-6 max-w-xs text-[13px] font-bold text-violet-200/60" style={{ animationDelay: '2.8s' }}>
-        Basado en la escala izquierda–derecha del CIS y en cómo la ciencia política estudia las ideologías
+        Preguntas basadas en el CIS, la Encuesta Social Europea, la Encuesta Mundial de Valores y el ISSP
       </p>
 
       <div className="torch" style={{ opacity: lit ? 0 : 1 }} />

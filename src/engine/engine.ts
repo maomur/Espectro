@@ -44,7 +44,8 @@ export function pickStages(rnd: () => number): RoundType[] {
  * 3. Cada ronda se llena con propuestas de partidos distintos, priorizando a los
  *    partidos que menos han salido, sin repetir propuesta en toda la partida.
  */
-export function buildRounds(weights: Weights, seed: number, proposals: Proposal[] = PROPOSALS): Round[] {
+/** `avoid`: ideas de tu último test; se dejan para el final y solo salen si no queda otra */
+export function buildRounds(weights: Weights, seed: number, proposals: Proposal[] = PROPOSALS, avoid: Set<string> = new Set()): Round[] {
   const rnd = mulberry32(seed)
   const shuffle = <T,>(a: T[]) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] } return a }
   const stages = pickStages(rnd)
@@ -70,12 +71,15 @@ export function buildRounds(weights: Weights, seed: number, proposals: Proposal[
       const ps = pool(topic)
       const parties = [...new Set(ps.map((p) => p.partyId))]
         // menos salidas primero; a igualdad, el que más propuestas le quedan en el tema
-        .map((id) => ({ id, k: exposure[id] - ps.filter((p) => p.partyId === id).length * 0.3 + rnd() * 0.25 }))
+        // y si es posible, que tenga ideas que no salieron en tu último test
+        .map((id) => ({ id, k: exposure[id] - ps.filter((p) => p.partyId === id).length * 0.3 - (ps.some((p) => p.partyId === id && !avoid.has(p.id)) ? 0.4 : 0) + rnd() * 0.25 }))
         .sort((x, y) => x.k - y.k)
         .slice(0, size)
         .map((x) => x.id)
       const items = shuffle(parties.map((party) => {
-        const opts = ps.filter((p) => p.partyId === party)
+        const all = ps.filter((p) => p.partyId === party)
+        const fresh = all.filter((p) => !avoid.has(p.id))
+        const opts = fresh.length ? fresh : all
         const chosen = opts[Math.floor(rnd() * opts.length)]
         used.add(chosen.id)
         exposure[party]++
