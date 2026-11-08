@@ -60,7 +60,7 @@ export function Intro() {
 
       <p className="screen-in mt-7 max-w-xs text-xl leading-snug font-bold text-violet-100/90" style={{ animationDelay: '2s' }}>
         ¿Eres de <span className="text-rose-300">izquierdas</span>, de <span className="text-sky-300">derechas</span> o de <span className="text-violet-300">centro</span>?
-        <span className="mt-2 block text-base font-semibold text-violet-200/85">Contesta 25 preguntas jugando y descubre dónde te sitúas, de la extrema izquierda a la extrema derecha.</span>
+        <span className="mt-2 block text-base font-semibold text-violet-200/85">Contesta 25 preguntas sencillas y descubre dónde te sitúas, de la extrema izquierda a la extrema derecha.</span>
       </p>
 
       <div className="screen-in mt-9" style={{ animationDelay: '2.5s' }}>

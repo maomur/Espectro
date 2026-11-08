@@ -64,9 +64,9 @@ export function Topics() {
 
       <div className="flex flex-col items-center gap-3">
         <p className="text-base font-bold text-violet-100/85">
-          <span className="font-display text-2xl text-amber-200">25</span> preguntas en <span className="font-display text-2xl text-amber-200">5</span> fases de juego
+          <span className="font-display text-2xl text-amber-200">25</span> preguntas en <span className="font-display text-2xl text-amber-200">5</span> bloques
         </p>
-        <button className="btn-main w-full" onClick={go}>¡A jugar! 🎲</button>
+        <button className="btn-main w-full" onClick={go}>Descubrir mi ideología 🧭</button>
       </div>
     </div>
   )

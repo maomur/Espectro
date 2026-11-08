@@ -73,7 +73,7 @@ export function Reveal() {
           <div className="glass rounded-3xl p-6 text-center">
             <p className="font-display text-[1.8rem] leading-tight font-extrabold">Has saltado todas las preguntas</p>
             <p className="mt-2 text-[1.15rem] font-semibold text-violet-100/85">Sin respuestas no podemos situarte. ¡Prueba otra vez!</p>
-            <button className="btn-main mt-5 w-full" onClick={() => { sfx.whoosh(); restart() }}>Jugar otra vez</button>
+            <button className="btn-main mt-5 w-full" onClick={() => { sfx.whoosh(); restart() }}>Repetir el test</button>
           </div>
         ) : <>
           {/* 1 · Lo importante, en grande */}
@@ -145,7 +145,7 @@ export function Reveal() {
             <div className="screen-in flex flex-col gap-3">
               <button className="btn-main" onClick={openCard}>🏅 Compartir mi medalla</button>
               <button className="btn-ghost py-3.5 text-[1.05rem]" onClick={share}>Retar a un amigo 📲</button>
-              <button className="btn-ghost py-3.5 text-[1.05rem]" onClick={() => { sfx.whoosh(); restart() }}>Jugar otra vez</button>
+              <button className="btn-ghost py-3.5 text-[1.05rem]" onClick={() => { sfx.whoosh(); restart() }}>Repetir el test</button>
             </div>
 
             <p className="screen-in rounded-2xl border border-white/10 bg-white/5 p-4 text-[1.02rem] leading-snug font-semibold text-violet-100/80">
