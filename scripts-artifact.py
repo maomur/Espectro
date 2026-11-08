@@ -1,0 +1,11 @@
+import re,sys
+s=open('dist-artifact/index.html').read()
+head=re.search(r'<head>(.*)</head>',s,re.S).group(1)
+body=re.search(r'<body>(.*)</body>',s,re.S).group(1)
+head=re.sub(r'<meta[^>]*>','',head); head=re.sub(r'<title>.*?</title>','',head)
+# mover el script de módulo al final del body (necesita #root)
+scripts=re.findall(r'<script[^>]*>.*?</script>',head,re.S)
+for sc in scripts: head=head.replace(sc,'')
+out='<title>Espectro</title>\n<style>html{box-sizing:border-box;background:#0d0a24;color-scheme:dark}body{background:#0d0a24}</style>\n'+head+body+''.join(scripts)
+open(sys.argv[1],'w').write(out)
+print(len(out))
